@@ -5,7 +5,6 @@ interface AuthProvider {
   children: ReactNode
 }
 
-
 interface AuthResponse {
   token: string,
   user: {
@@ -16,7 +15,6 @@ interface AuthResponse {
   }
 }
 
-
 interface IUser {
   id: string,
   name: string,
@@ -26,7 +24,8 @@ interface IUser {
 
 interface AuthContextData {
   user: IUser | null,
-  signInUrl: string
+  signInUrl: string,
+  signOut: () => void
 }
 
 export const AuthContext = createContext({} as AuthContextData);
@@ -46,7 +45,14 @@ export function AuthProvider( { children } : AuthProvider) {
 
     localStorage.setItem('@dowhile:token', token);
 
+    api.defaults.headers.common.authorization = `Bearer ${token}`;
+
     setUser(user);
+  }
+
+  function signOut() {
+    setUser(null);
+    localStorage.removeItem('@dowhile:token');
   }
 
   useEffect(() => {
@@ -62,8 +68,20 @@ export function AuthProvider( { children } : AuthProvider) {
     }
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('@dowhile:token');
+
+    if(token) {
+      api.defaults.headers.common.authorization = `Bearer ${token}`;
+
+      api.get<IUser>('profile').then(response => {
+        setUser(response.data);
+      });
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ signInUrl, user }}>
+    <AuthContext.Provider value={{ signInUrl, user, signOut }}>
       { children }
     </AuthContext.Provider>
   );
