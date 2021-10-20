@@ -37,10 +37,10 @@ export function MessageList() {
                     <span>{message.user.name}</span>
                   </div>
               </li>
-            )
+            );
           })
         }
       </ul>
     </div>
-  )
+  );
 }

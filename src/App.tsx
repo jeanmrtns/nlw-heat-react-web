@@ -9,5 +9,5 @@ export function App() {
       <MessageList />
       <LoginBox />
     </main>
-  )
+  );
 }
